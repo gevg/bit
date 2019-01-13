@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11
+        environment:
+          GO111MODULE: "on"
+    working_directory: /go/src/github.com/gevg/bit
+    steps:
+      - checkout
+      - run: go get -t github.com/gevg/bit/...
+      - run: go test -v -race -tags integration github.com/gevg/bit/...
