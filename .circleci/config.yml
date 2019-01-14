@@ -8,7 +8,7 @@ jobs:
     working_directory: /go/src/github.com/gevg/bit
     steps:
       - checkout
-      - run: go get github.com/mattn/goveralls
       - run: go get -v -d ./...
       - run: go test -cover -v -race -coverprofile=./coverage.out ./...
-      - run: /home/ubuntu/.go_workspace/bin/goveralls -coverprofile=./coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+      - run: go get github.com/mattn/goveralls
+      - run: goveralls -coverprofile=./coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
