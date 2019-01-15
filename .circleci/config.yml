@@ -26,14 +26,14 @@ jobs:
     working_directory: ~/src/github.com/gevg/bit
     steps:
       - checkout
-      - run: go test -cover -v -race -coverprofile=./coverage.out ./...
+      - run: go test -cover -v -race -coverprofile=./coverage.out
       - run: go get github.com/mattn/goveralls
       - run: goveralls -coverprofile=./coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
 
 workflows:
   version: 2
   build_and_test:
-  jobs:
-    - build-go1.10
-    - build-go1.11
-    - build-go1.11-gomodules
+    jobs:
+      - build-go1.10
+      - build-go1.11
+      - build-go1.11-gomodules
