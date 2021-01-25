@@ -1,4 +1,4 @@
-name: CI
+name: ci
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
         run: go test -v ./...
 
       - name: Coverage
-        run: ./script/coverage
+        run: go test -cover -v -race -coverprofile=./coverage.out
 
       - name: Upload Unit Test Coverage
         uses: codecov/codecov-action@v1.0.5
