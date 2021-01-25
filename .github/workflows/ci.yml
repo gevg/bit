@@ -35,13 +35,13 @@ jobs:
         run: go test -v ./...
 
       - name: Coverage
-        run: go test -cover -v -race -covermode=atomic -coverprofile=./coverage.out
+        run: go test -cover -v -race -covermode=atomic -coverprofile=./coverage.txt
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v1.0.5
+        uses: codecov/codecov-action@v1
         with:
           fail_ci_if_error: true
-          file: ./coverage.out
+          file: ./coverage.txt
           flags: unittests
           name: codecov-umbrella
           token: ${{ secrets.CODECOV_TOKEN }}
