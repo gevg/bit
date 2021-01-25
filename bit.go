@@ -1,12 +1,10 @@
 // Copyright 2019 Geert Van Gorp. All rights reserved.
-// Use of this source code is governed by the MIT License
-// which can be found in the LICENSE file.
+// Use of this source code is governed by the BSD 3-Clause
+// License which can be found in the LICENSE file.
 
 package bit
 
-import (
-	"math/bits"
-)
+import "math/bits"
 
 // Tree represents a Binary Indexed Tree (BIT) type.
 type Tree []int32
@@ -27,8 +25,8 @@ func Len(t Tree) int {
 
 // From creates a Binary Indexed Tree from a slice of numbers.
 // When the reUse option is set, the tree will use the numbers
-// input slice as its backing store, avoiding new allocations.
-// Default behavior for the tree is to allocate its own backing store.
+// slice as its backing store, avoiding new allocations. Default
+// behavior for the tree is to allocate its own backing store.
 func From(numbers []int32, reUse ...bool) Tree {
 	var t Tree
 
@@ -173,9 +171,8 @@ func (t Tree) RangeSum(lo, hi int) int32 {
 }
 
 // Sums returns the prefix sums of the tree. If the length of the sums slice
-// is too small, the Sums function fills the slice starting from index 0 and
-// stops when the slice is full. Sums returns the number of elements in the
-// sums slice.
+// is too small, Sums fills the slice starting from index 0 and stops when
+// the slice is full. Sums returns the number of elements in the sums slice.
 func (t Tree) Sums(sums []int32) int {
 	i := 0
 	for i < len(sums) {
@@ -193,7 +190,7 @@ func (t Tree) Sums(sums []int32) int {
 	return i
 }
 
-// Number returns the number at index i.
+// Number returns the element at index i.
 // If i is outside of the tree, 0 will be returned.
 func (t Tree) Number(i int) int32 {
 	if i < 0 || len(t) <= i {
@@ -211,9 +208,9 @@ func (t Tree) Number(i int) int32 {
 	return number
 }
 
-// RangeNumbers returns in the buf variable a slice of numbers, as defined by
-// the given boundaries. The upper bound is not included. If the lo index is
-// out of boundaries, zero will be returned.
+// RangeNumbers returns in the buf variable a slice of numbers, as defined
+// by the given boundaries. The upper bound is not included. If the lo index
+// is out of boundaries, zero will be returned.
 func (t Tree) RangeNumbers(lo int, buf []int32) int {
 	if lo < 0 || lo >= len(t) {
 		return 0
@@ -228,9 +225,9 @@ func (t Tree) RangeNumbers(lo int, buf []int32) int {
 	return i
 }
 
-// Numbers returns the numbers in the tree. The caller provides the array to
-// store the numbers. If the numbers slice is too short, only numbers up to
-// the length of the slice will be returned.
+// Numbers returns all numbers in the tree. The caller provides the array
+// to store the numbers. If the numbers slice is too short, only numbers
+// up to the length of the slice will be returned.
 func (t Tree) Numbers(numbers []int32) int {
 	n := copy(numbers, t)
 
@@ -247,7 +244,7 @@ func (t Tree) Numbers(numbers []int32) int {
 }
 
 // SetNumber sets a number at a given index. If the
-// index is outside of the tree, no change is made.
+// index is outside of the tree, no updates are made.
 func (t Tree) SetNumber(i int, number int32) {
 	if i < 0 || len(t) <= i {
 		return
@@ -298,7 +295,7 @@ func (t Tree) MulNumber(i int, value int32) int32 {
 	// calculate delta that needs to be added
 	delta := number * (value - 1)
 
-	// add delta by adding to the relevant partial sums
+	// add delta to the relevant partial sums
 	for 0 <= j && j < len(t) {
 		t[j] += delta
 		j |= j + 1
