@@ -30,7 +30,7 @@ func Len(t Tree) int {
 func From(numbers []int32, reUse ...bool) Tree {
 	var t Tree
 
-	if len(reUse) == 0 || reUse[0] == false {
+	if len(reUse) == 0 || !reUse[0] {
 		t = make(Tree, len(numbers))
 		copy(t, numbers)
 	} else {
@@ -243,9 +243,9 @@ func (t Tree) Numbers(numbers []int32) int {
 	return n
 }
 
-// SetNumber sets a number at a given index. If the
-// index is outside of the tree, no updates are made.
-func (t Tree) SetNumber(i int, number int32) {
+// Set sets a number at a given index. If the index
+// is outside of the tree, no updates are made.
+func (t Tree) Set(i int, number int32) {
 	if i < 0 || len(t) <= i {
 		return
 	}
@@ -266,9 +266,9 @@ func (t Tree) SetNumber(i int, number int32) {
 	}
 }
 
-// AddNumber adds the given value to the tree at index i. If
-// the index is outside of the tree boundaries, no value is added.
-func (t Tree) AddNumber(i int, value int32) {
+// Add adds the given vanlue to the number in the tree at index i.
+// If the index is outside of the tree boundaries, no value is added.
+func (t Tree) Add(i int, value int32) {
 	// add value to relevant partial sums
 	for 0 <= i && i < len(t) {
 		t[i] += value
@@ -276,9 +276,9 @@ func (t Tree) AddNumber(i int, value int32) {
 	}
 }
 
-// MulNumber multiplies the number at index i with the given value. If the
+// Mul multiplies the number at index i with the given value. If the
 // index is outside of the tree boundaries, no modifications are done.
-func (t Tree) MulNumber(i int, value int32) int32 {
+func (t Tree) Mul(i int, value int32) int32 {
 	if i < 0 || len(t) <= i {
 		return 0
 	}
@@ -322,28 +322,28 @@ func (t Tree) Scale(value int32) {
 // at index i and subsequent indices.
 func (t Tree) RangeAdd(i int, numbers []int32) {
 	for j := 0; j < len(numbers) && i < len(t); i, j = i+1, j+1 {
-		t.AddNumber(i, numbers[j])
+		t.Add(i, numbers[j])
 	}
 }
 
-// RangeMul multiplies a slice of numbers to the numbers in the tree,
-// starting at index i.
+// RangeMul multiplies a slice of numbers with the respective numbers
+// in the tree, starting at index i.
 func (t Tree) RangeMul(i int, factors []int32) {
 	for j := 0; j < len(factors) && i < len(t); i, j = i+1, j+1 {
-		t.MulNumber(i, factors[j])
+		t.Mul(i, factors[j])
 	}
 }
 
 // RangeSet sets a slice of numbers in the tree, starting at index i.
 func (t Tree) RangeSet(i int, numbers []int32) {
 	for j := 0; j < len(numbers) && i < len(t); i, j = i+1, j+1 {
-		t.SetNumber(i, numbers[j])
+		t.Set(i, numbers[j])
 	}
 }
 
 // RangeShift adds the given value to all numbers in the [lo, hi) index
-// range of the tree. If lo and/or hi are outside the boundaries of the
-// tree, the [lo, hi) range will be intersected with the tree range.
+// range of the tree. If lo/hi are outside the boundaries of the tree,
+// the [lo, hi) range will be intersected with the tree range.
 func (t Tree) RangeShift(lo, hi int, value int32) {
 	cumVal := value
 	if lo < 0 {
@@ -382,11 +382,12 @@ func minabs(a, b int32) int32 {
 	return a
 }
 
-// RangeScale scales all numbers in the [lo, hi) range
-// of the tree with the given multiplier.
+// RangeScale scales all numbers in the [lo, hi) range of the tree with
+// the given multiplier. If lo/hi are outside the boundaries of the tree,
+// the [lo, hi) range will be intersected with the tree range.
 func (t Tree) RangeScale(lo, hi int, multiplier int32) {
 	for i := lo; i < hi && 0 <= i && i < len(t); i++ {
-		t.MulNumber(i, multiplier)
+		t.Mul(i, multiplier)
 	}
 }
 

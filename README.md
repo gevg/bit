@@ -17,7 +17,7 @@ A Fenwick tree is a simple data structure to solve this problem. Construction ta
 
 This library provides a pure `go` implementation with an extensive API. Updates and queries are supported on both numbers and prefix sums. They can be performed on a single element, a range of elements or the whole tree. There is no need to keep hold of the numbers array once the BIT is constructed, as the numbers can be calculated from the BIT. If required, the Fenwick tree can re-use the numbers array, avoiding memory allocations during BIT construction.
 
-The construction of a Fenwick tree is most efficient when the number of elements is known at construction, using `From(numbers)`. When only the number of elements is known at construction, the tree can be built using `New(n)` and numbers can be added through `SetNumber()` and/or `AddNumber()`. When the number of elements is unknown, the tree can be constructed with `New()` and numbers can be appended to the tree with `Append()`.
+The construction of a Fenwick tree is most efficient when the number of elements is known at construction, using `From(numbers)`. When only the number of elements is known at construction, the tree can be built using `New(n)` and numbers can be added through `Set()` and/or `Add()`. When the number of elements is unknown, the tree can be constructed with `New()` and numbers can be appended to the tree with `Append()`.
 
 This repository uses zero-based indexing. While this slightly complicates the implementation, it makes the Fenwick tree more natural to use.
 
@@ -33,7 +33,7 @@ $ go get -u github.com/gevg/bit
 
 ## Usage
 
-Construct the tree, initializing it with a number array, and iterate the tree.
+Construct the tree, initializing it with a number array, and iterate the prefix sums.
 
 ```go
 // initialize a number array, construct the BIT tree and iterate the prefix sums
@@ -45,49 +45,71 @@ for i := range tree {
 }
 ```
 
-Alternatively, you can construct a tree of a given length and add the numbers.
-`AddNumber()` increases the value at a given index, while `SetNumber()` overwrites the existing value.
+Alternatively, one can construct a tree of a given length and subsequently add numbers.
+`Add()` increases the value of a number at a given index, while `Set()` overwrites the existing value.
 
 ```go
-// Construct a tree of length 10, add/set the elements.
+// Construct a tree of length 10, and add/set elements in various ways.
 tree := New(10)
-tree.AddNumber(0, 1); tree.SetNumber(1, 3); tree.SetNumber(2, 5)
+tree.Add(0, 1); tree.Set(1, 3); tree.Set(2, 5)
 tree.RangeAdd(3, []int32{7, 9, 11}), tree.RangeSet(6, []int32{13, 15, 17, 19})
 
-// Calculate the range sum for the indices 2 and 3.
+// Calculate the range sum for range [2, 4).
 sums := tree.RangeSum(2, 4)
 ```
 
-Numbers or a range of numbers in an tree can be multiplied by a factor and the impact on the prefix sums can be viewed.
+A third option is to create an empty tree and extend it wit the Append function. One can append a single number or a range of numbers.
 
 ```go
-// Scale the the numbers in the tree with a factor 5. Subsequently, scale the range [2, 8) with a factor 6. Additionally, multiply the number at index 5 with factor -2. We can also multiply each number in a range with a different factor. RangeMul multiplies a range of 3 numbers with different factors, starting at index 2. Subsequently, the prefix sums are shown.
-tree.Scale(5)
-tree.RangeScale(2, 8, 6)
-tree.MulNumber(5, -2)
-tree.RangeMul(2, []int32{2, 4, 6})
-sums := make([]int32, 6)
-n := tree.Sums(sums)
-fmt.Printf("%d prefix sums: %v\n", n, sums)
+// Construct a tree of zero length.
+tree := New()
+
+// Append element 1 at index 0, followed by a range of 4 numbers.
+tree = Append(tree, 1); tree = Append(tree, []int32{3, 5, 7, 9}...)
 ```
 
-Similar operations exist for addition. First, we shift all numbers by 5. Subsequently, shift the range [2, 8) with a value 6, and add -2 to the number at index 5.
+Numbers and number ranges can be multiplied by a factor and the impact on the prefix sums can be shown.
 
 ```go
-// Shift all numbers by 5. Subsequently, shift the numbers in the range [2, 8) with the value 6, and add the value -2 to the number at index 5. Add to the numbers of the range of length 3, starting at index 2, the values 2, 4, and 6 respectively. Copy the range of prefix sums in the sums slice and show it.
+// Scale all numbers in the tree with a factor 5.
+tree.Scale(5)
+
+// Scale the numbers in range [2, 8) with 6, and multiply the value at index 5 with -2.
+tree.RangeScale(2, 8, 6); tree.Mul(5, -2)
+
+// Each number in a range can also be multiplied with a different factor. RangeMul
+// multiplies a range of 3 numbers with different factors, starting at index 2.
+tree.RangeMul(2, []int32{2, 4, 6})
+
+// Finally, the prefix sums are calculated and shown together with the numbers.
+nums, sums := make([]int32, 6), make([]int32, 6)
+nn := tree.Numbers(nums); ns := tree.Sums(sums)
+fmt.Printf("numbers: %v, prefix sums: %v\n", nums, sums)
+```
+
+Similar operations exist for addition.
+
+```go
+// Increase all numbers by 5, and add 6 to all numbers in the range [2, 8).
 tree.Shift(5)
 tree.RangeShift(2, 8, 6)
-tree.AddNumber(5, -2)
+
+// Subsequently, subtract 2 from the number at index 5.
+tree.Add(5, -2)
+
+//Add to the range of length 3, starting at index 2, the values 2, 4, and 6, respectively
 tree.RangeAdd(2, []int32{2, 4, 6})
-sums := make([]int32, 6)
-n := tree.Sums(2, sums)
+
+// Copy the range of prefix sums, starting at index 2, in the sums slice and show.
+sums := make([]int32, 4)
+n := tree.RangeSum(2, sums)
 fmt.Printf("%d prefix sums: %v\n", n, sums)
 ```
 
-We can search for a prefix sum smaller than or equal to a given value. The algorithm only works for monotonically increasing prefix sums, as this is the prevalent use case. Other cases can be added when requested (through the issue tracker).
+We can search the largest prefix sum, smaller than or equal to a given value. The algorithm only works for monotonically increasing prefix sums, as this is the prevalent use case. Other cases can be added when requested (through the issue tracker).
 
 ```go
-// Search the largest prefix sum smaller than or equal to 6 and print out its index and value.
+// Search the largest prefix sum, smaller than or equal to 6, and print out the index and value.
 fmt.Printf("(i, sum) = (%d, %d)\n", tree.SearchSum(6))
 ```
 
@@ -98,7 +120,7 @@ Implementation of the following features:
 - [ ] Add examples to documentation.
 - [ ] Introduction of parameterized types as soon as they become available in the `go` language.
 - [ ] 2D Fenwick tree?
-- [ ] Cache-related performance improvements for large arrays at the cost of the zero allocation BIT construction?
+- [ ] Cache-related performance improvements for large arrays at the cost of zero allocation BIT construction?
 - [ ] An alternative implementation of some features in assemby using AVX2 SIMD?
 
 ## License

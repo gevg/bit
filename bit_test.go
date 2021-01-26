@@ -39,21 +39,20 @@ var testcases = []struct {
 // Tests with an empty tree
 func TestNew(t *testing.T) {
 	tree := New()
-	l := Len(tree)
+	Len(tree)
 	tree.Reset()
 	dst := New()
-	n := Copy(dst, tree)
+	Copy(dst, tree)
 	tree = Append(tree)
-	l = Len(tree)
-	sum := tree.Sum(0)
-	sum = tree.RangeSum(0, 0)
-	n = tree.Sums(nil)
-	sum = tree.Number(0)
-	n = tree.RangeNumbers(0, nil)
-	n = tree.Numbers(nil)
-	tree.SetNumber(0, -5)
-	tree.AddNumber(0, -5)
-	tree.MulNumber(0, -5)
+	tree.Sum(0)
+	tree.RangeSum(0, 0)
+	tree.Sums(nil)
+	tree.Number(0)
+	tree.RangeNumbers(0, nil)
+	tree.Numbers(nil)
+	tree.Set(0, -5)
+	tree.Add(0, -5)
+	tree.Mul(0, -5)
 	tree.Shift(-5)
 	tree.Scale(-5)
 	tree.RangeShift(0, 0, -5)
@@ -62,7 +61,6 @@ func TestNew(t *testing.T) {
 	tree.RangeMul(0, nil)
 	tree.RangeSet(0, nil)
 	tree.SearchSum(5)
-	_, _, _ = n, l, sum
 }
 
 func TestFrom(t *testing.T) {
@@ -120,7 +118,7 @@ func TestNewAndSet(t *testing.T) {
 		tree := New(len(tc.numbers))
 
 		for j, v := range tc.numbers {
-			tree.SetNumber(j, v)
+			tree.Set(j, v)
 		}
 
 		for j, want := range tc.tree {
@@ -305,12 +303,12 @@ func TestNumber(t *testing.T) {
 	}
 }
 
-func TestSetNumber(t *testing.T) {
+func TestSet(t *testing.T) {
 	for i, tc := range testcases {
 		tree := From(tc.numbers)
 
 		for j := range tc.numbers {
-			tree.SetNumber(j, -5)
+			tree.Set(j, -5)
 		}
 
 		for j := range tc.numbers {
@@ -343,12 +341,12 @@ func TestRangeSet(t *testing.T) {
 	}
 }
 
-func TestAddNumber(t *testing.T) {
+func TestAdd(t *testing.T) {
 	for i, tc := range testcases {
 		tree := From(tc.numbers)
 
 		for j := range tc.numbers {
-			tree.AddNumber(j, tree.Number(j))
+			tree.Add(j, tree.Number(j))
 		}
 
 		for j := range tc.numbers {
@@ -362,14 +360,14 @@ func TestAddNumber(t *testing.T) {
 	}
 }
 
-func TestMulNumber(t *testing.T) {
+func TestMul(t *testing.T) {
 	const x = 8
 
 	for i, tc := range testcases {
 		tree := From(tc.numbers)
 
 		for j := range tc.numbers {
-			tree.MulNumber(j, x)
+			tree.Mul(j, x)
 		}
 
 		for j := range tc.numbers {
@@ -548,8 +546,8 @@ func TestLargerSamples(t *testing.T) {
 			)
 		}
 
-		// AddNumber()
-		newtree.AddNumber(i, num)
+		// Add()
+		newtree.Add(i, num)
 		if number := newtree.Number(i); number != num {
 			t.Errorf(
 				"index: %d, number got: %d != want: %d\n",
@@ -557,8 +555,8 @@ func TestLargerSamples(t *testing.T) {
 			)
 		}
 
-		// MulNumber()
-		number := newtree.MulNumber(i, factor)
+		// Mul()
+		number := newtree.Mul(i, factor)
 		if number != factor*num {
 			t.Errorf(
 				"index: %d, number got: %d != want: %d\n",
@@ -566,8 +564,8 @@ func TestLargerSamples(t *testing.T) {
 			)
 		}
 
-		// SetNumber()
-		newtree.SetNumber(i, num)
+		// Set()
+		newtree.Set(i, num)
 		if number := newtree.Number(i); number != num {
 			t.Errorf("index: %d, number got: %d != want: %d\n", i, number, num)
 		}
@@ -611,7 +609,7 @@ func TestLargerSamples(t *testing.T) {
 	// Shift()
 	newtree.Shift(shift)
 	for i, want := range numbers {
-		newtree.AddNumber(i, -shift)
+		newtree.Add(i, -shift)
 		got := newtree.Number(i)
 		if got != want {
 			t.Errorf("index: %d, number got: %d != want: %d\n", i, got, want)
@@ -633,7 +631,7 @@ func TestLargerSamples(t *testing.T) {
 	newtree.RangeShift(lo, hi, shift)
 	for i, want := range numbers {
 		if lo <= i && i < hi {
-			newtree.AddNumber(i, -shift)
+			newtree.Add(i, -shift)
 		}
 		got := newtree.Number(i)
 		if got != want {
@@ -772,14 +770,14 @@ func BenchmarkTree(b *testing.B) {
 		}
 	})
 
-	b.Run("SetNumber", func(b *testing.B) {
+	b.Run("Set", func(b *testing.B) {
 		tree := New(len(in1))
 		b.ReportAllocs()
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
 			for j := range in1 {
-				tree.SetNumber(j, -5)
+				tree.Set(j, -5)
 			}
 		}
 	})
@@ -870,14 +868,14 @@ func BenchmarkTree(b *testing.B) {
 		}
 	})
 
-	b.Run("AddNumber", func(b *testing.B) {
+	b.Run("Add", func(b *testing.B) {
 		tree := From(in1)
 		b.ReportAllocs()
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
 			for j := range in1 {
-				tree.AddNumber(j, -5)
+				tree.Add(j, -5)
 			}
 		}
 	})
@@ -917,14 +915,14 @@ func BenchmarkTree(b *testing.B) {
 		}
 	})
 
-	b.Run("MulNumber", func(b *testing.B) {
+	b.Run("Mul", func(b *testing.B) {
 		tree := From(in1)
 		b.ReportAllocs()
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
 			for j := range in1 {
-				tree.MulNumber(j, -5)
+				tree.Mul(j, -5)
 			}
 		}
 	})
