@@ -110,7 +110,6 @@ func TestCopy(t *testing.T) {
 			t.Errorf("Index: %d, dst: %d != 0\n", i, dst[i])
 		}
 	}
-
 }
 
 func TestNewAndSet(t *testing.T) {

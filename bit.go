@@ -174,8 +174,7 @@ func (t Tree) RangeSum(lo, hi int) int32 {
 // is too small, Sums fills the slice starting from index 0 and stops when
 // the slice is full. Sums returns the number of elements in the sums slice.
 func (t Tree) Sums(sums []int32) int {
-	i := 0
-	for i < len(sums) {
+	for i := range sums {
 		var sum int32
 		j := i
 		// calculate sum[i] prefix sum by adding relevant partial sums
@@ -184,10 +183,9 @@ func (t Tree) Sums(sums []int32) int {
 			j = j&(j+1) - 1
 		}
 		sums[i] = sum
-		i++
 	}
 
-	return i
+	return len(sums)
 }
 
 // Number returns the element at index i.

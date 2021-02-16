@@ -40,7 +40,7 @@ Construct the tree, initializing it with a number array, and iterate the prefix 
 numbers := []int32{1, 3, 5, 7, 9, 11, 13, 15, 17, 19}
 tree := From(numbers)
 
-for i := range tree {
+for i := range numbers {
     fmt.Printf("tree(%d) = %d\n", i, tree.Sum(i))
 }
 ```
@@ -52,20 +52,20 @@ Alternatively, one can construct a tree of a given length and subsequently add n
 // Construct a tree of length 10, and add/set elements in various ways.
 tree := New(10)
 tree.Add(0, 1); tree.Set(1, 3); tree.Set(2, 5)
-tree.RangeAdd(3, []int32{7, 9, 11}), tree.RangeSet(6, []int32{13, 15, 17, 19})
+tree.RangeAdd(3, []int32{7, 9, 11}); tree.RangeSet(6, []int32{13, 15, 17, 19})
 
 // Calculate the range sum for range [2, 4).
 sums := tree.RangeSum(2, 4)
 ```
 
-A third option is to create an empty tree and extend it wit the Append function. One can append a single number or a range of numbers.
+A third option is to create an empty tree and extend it with the Append function. One can append a single number or a range of numbers.
 
 ```go
 // Construct a tree of zero length.
 tree := New()
 
 // Append element 1 at index 0, followed by a range of 4 numbers.
-tree = Append(tree, 1); tree = Append(tree, []int32{3, 5, 7, 9}...)
+tree = Append(tree, 1); tree = Append(tree, []int32{3, 5, 7, 9}...); tree = Append(tree, 11, 13)
 ```
 
 Numbers and number ranges can be multiplied by a factor and the impact on the prefix sums can be shown.
